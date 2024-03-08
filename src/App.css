@@ -1,0 +1,164 @@
+:root {
+  --preloader-circle-endsize: 20vw;
+  --amazing-cubic:  cubic-bezier(.2,.9,.45,1);
+}
+
+body {
+  background-color: white;
+  transition: background-color .76s var(--amazing-cubic);
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+.preloader {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  pointer-events: none;
+}
+.preloader-circle {
+  width: var(--preloader-circle-endsize);
+  height: 20vw;
+  position: absolute;
+  z-index: 500;
+  top: calc(50vh - 0.5 * var(--preloader-circle-endsize));
+  left: calc(50vw - 0.5 * var(--preloader-circle-endsize));
+  background-color: rgb(7, 8, 19);
+  transform: scale(500);
+  border-radius: 100%;
+}
+
+.preloader-circle1 {
+  animation: exitTransform 1.5s var(--amazing-cubic) forwards 1 .2s;
+}
+
+.preloader-circle2 {
+  animation: exitTransform 1.5s var(--amazing-cubic) forwards 1 .3s;
+  background-color: rgb(233, 74, 0);
+  opacity: 1;
+  z-index: 499;
+}
+
+@keyframes exitTransform {
+  0% {
+    transform: scale(500);
+    opacity: 1;
+  } 80% {
+    opacity: 1;
+  } 100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+}
+
+#darkmode-switch {
+  pointer-events: none;
+}
+
+.darkmode-container {
+  position: fixed;
+  height: 30px;
+  width: 100px;
+  bottom: 3vh;
+  left: 3vw;
+  opacity: 0;
+  z-index: 100;
+  transition: opacity 1s var(--amazing-cubic) 2s;
+  pointer-events: none;
+}
+
+.darkmode-content {
+  display: flex;
+  flex-direction: column;
+  width: 70%;
+}
+
+label,
+.darkmode-toggle {
+  height: 30px;
+  border-radius: 100px;
+}
+
+label {
+  width: 100px;
+  background-color: rgba(134, 134, 134, 0.158);
+  border-radius: 100px;
+  position: relative;
+  cursor: pointer;
+}
+
+.darkmode-toggle {
+  position: absolute;
+  width: 50%;
+  background-color: #fff;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.322);
+  transition: transform .3s var(--amazing-cubic);
+}
+
+.darkmode-label-sun {
+  position: absolute;
+  width: 24px;
+  left: 13px;
+  top: 3px;
+
+}
+.darkmode-label-moon {
+  position: absolute;
+  width: 20px;
+  left: 65px;
+  top: 5px;
+  transition: filter var(--amazing-cubic) .5s;
+  filter: invert(1);
+}
+
+.darkmode-label-dark {
+  opacity: .5;
+}
+
+[type="checkbox"] {
+  display: none;
+}
+
+[type="checkbox"]:checked + .darkmode-container .darkmode-toggle {
+  transform: translateX(100%);
+  background-color: #000111;
+}
+[type="checkbox"]:checked + .darkmode-container .darkmode-label-moon {
+  filter: invert(1);
+}
+
+.settings {
+  opacity: 0;
+  transition: opacity 1s var(--amazing-cubic) 2s;
+}
+
+.settings-wheel {
+  position: fixed;
+  height: 24px;
+  top: 3vh;
+  right: 3vw;
+  opacity: 1;
+  transition: transform .73s var(--amazing-cubic);
+}
+
+.settings-wheel:hover {
+  cursor: pointer;
+}
+
+.settings-wheel-fill {
+  opacity: 0;
+  filter: invert(1);
+  transition: opacity .7s var(--amazing-cubic);
+  pointer-events: none;
+}
+.settings-bg {
+  background-color: rgba(221, 201, 255, 0.493);
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  left: 100vw;
+  top: 0;
+  transition: left .73s cubic-bezier(.84,.35,0,1.01);
+}
