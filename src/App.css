@@ -129,7 +129,7 @@ label {
   filter: invert(1);
 }
 
-.settings, .bg-container, .title{
+.settings, .bg-container, .title {
   opacity: 0;
   transition: opacity 1s var(--amazing-cubic) 2s;
 }
@@ -264,6 +264,7 @@ label {
   top: 100px;
   opacity: 0;
   transition: top 1s cubic-bezier(.71,.19,.43,.96), opacity .5s cubic-bezier(.71,.19,.43,.96);
+  pointer-events: none;
 }
 
 .anime-container .letter {
@@ -282,6 +283,7 @@ label {
 .word, .title-jump {
   display: inline-block;
   pointer-events: all;
+  transition: transform .73s var(--amazing-cubic);
 }
 
 .title-jump:hover {
@@ -299,4 +301,38 @@ label {
   } 100% {
     transform: translateY(0px);
   }
+}
+
+.start-button {
+  width: 75px;
+  align-items: center;
+  pointer-events: all;
+  opacity: 0;
+  transition: opacity .73s var(--amazing-cubic), transform .73s var(--amazing-cubic);
+}
+
+.start-button:hover {
+  cursor: pointer;
+  opacity: .4;
+  transform: scale(1.2);
+}
+
+.start-container {
+  position: absolute;
+  left: calc(50vw - 0.5 * 75px);
+  margin-top: 10vh;
+}
+
+.orb {
+  width: 30px;
+  position: absolute;
+  transform: scale(1);
+  transition: transform 4s ease-in-out;
+  opacity: 0;
+  pointer-events: all;
+  z-index: 10;
+
+}
+.orb:hover {
+  cursor: pointer;
 }

@@ -4,7 +4,9 @@ import anime from 'animejs';
 import $ from 'jquery';
 import sun from './sun.png';
 import moon from './moon.png';
+import start from './start.png';
 import settings from './settings.png';
+import orb from './orb.png';
 import settingsFull from './settingsFull.png';
 import bg from './bg.png';
 
@@ -33,13 +35,16 @@ function App() {
     $(".darkmode-container, .settings, .bg-container, .title").css("opacity", "1");
     setTimeout(function() {
       $(".darkmode-container, #darkmode-switch").css("pointer-events", "all");
+      setTimeout(() => {
+        $(".start-button").css("opacity", "1");
+      }, 2000);
     }, 2200);
     
 
     //darkmode
     if (localStorage.getItem("darkmode")) {
       $("body").css("background-color", "#0a0b1d");
-      $(".settings-wheel").css("filter", "invert(1)");
+      $(".settings-wheel, .start-button, .orb").css("filter", "invert(1)");
       $("#darkmode-switch").prop("checked", true);
       $(".title").css("color", "white");
     }
@@ -48,13 +53,13 @@ function App() {
       if ($("#darkmode-switch").is(":checked")) {
         $(".title").css("color", "white");
         $(".settings-bg").css(".background-color", "rgba(158, 128, 204, 0.795)");
-        $(".settings-wheel").css("filter", "invert(1)");
+        $(".settings-wheel, .start-button, .orb").css("filter", "invert(1)");
         $("body").css("background-color", "#0a0b1d");
         localStorage.setItem("darkmode", "true");
       } else {
         $(".title").css("color", "black");
         $(".settings-bg").css(".background-color", "rgba(221, 201, 255, 0.493)");
-        $(".settings-wheel").css("filter", "invert(0)");
+        $(".settings-wheel, .start-button, .orb").css("filter", "invert(0)");
         $("body").css("background-color", "white");
         localStorage.removeItem("darkmode");
       }
@@ -124,11 +129,92 @@ function App() {
 
     //options
     $(".option").on("click", function() {
+      if (activeGame) {
+        return;
+      }
       $(".option").removeClass("option-selected");
       $(this).addClass("option-selected");
-
       localStorage.setItem("difficulty", `${$(this).text()}`)
     })
+    
+    //start button
+    $(".start-button").on(("click"), function() {
+      $(".word").css("transition", "transform 2s var(--amazing-cubic)")
+      $(".word").eq(0).css("transform", "translateX(-100vw)");
+      $(".word").eq(1).css("transform", "translateX(100vw)");
+      $(".start-button").css({
+        "transform": "translateY(30vh)",
+        "opacity": "0",
+        "pointer-events": "none"
+      });
+      startGame();
+    })
+
+    //startGame() and game functionality
+    
+    var activeGame = false;
+    var totalScore = 0;
+
+    function startGame() {
+      activeGame = true;
+    
+      var orb = $(".orb");
+      var tempOrb = orb.clone();
+      $(".orb").css("display", "none");
+      var AmountOfOrbs = 0;
+    
+      function gameLoop() {
+        if (!activeGame) {
+          return; // Stop the loop if activeGame is false
+        }
+    
+        AmountOfOrbs++;
+    
+        var newOrb = tempOrb.clone();
+        newOrb.addClass(`orb_${AmountOfOrbs}`);
+        var newPoint = generatePoint();
+        newOrb.css({ left: newPoint.left, top: newPoint.top });
+    
+        if (!localStorage.getItem("darkmode")) {
+          newOrb.css("filter", "invert(0)");
+        }
+    
+        $(".orb-container").prepend(newOrb);
+    
+        var wasTriggered = false;
+        newOrb.on("mouseenter", function() {
+          wasTriggered = true;
+          this.remove();
+          totalScore++;
+          console.log(totalScore);
+        });
+    
+        setTimeout(() => {
+          newOrb.css("transform", "scale(0) rotate(360deg)");
+          newOrb.css("opacity", "1");
+    
+          setTimeout(() => {
+            newOrb.off("mouseenter");
+            newOrb.remove();
+            if (!wasTriggered) {
+              activeGame = false;
+            }
+          }, 4000);
+        }, 200);
+    
+        setTimeout(gameLoop, 1000); // Call gameLoop again after 1000ms
+      }
+    
+      // Start the initial game loop
+      gameLoop();
+    }
+
+    function generatePoint() {
+      const left = Math.floor(Math.random() * 91) + 5;
+      const top = Math.floor(Math.random() * 91) + 5;
+ 
+      return { left: left + "vw", top: top + "vh" }
+    }
 
     //main title jumping animation
     $(".title-jump").on("mouseenter", function() {
@@ -235,7 +321,28 @@ function App() {
         <div className="title-jump">T</div>
       </span>
       </div>
+      <div className="start-container">
+        <img alt="start button" className="start-button" src={start} />
+      </div>
+
+
+
+
+      <div className="orb-container">
+        <img alt="spherical object" className="orb" src={orb}/>
+      </div>
+
+
+
+
+
+
     </div>
+
+
+
+
+
   </div>
   );
 }
