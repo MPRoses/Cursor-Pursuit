@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
-import $, { event } from 'jquery';
+import $ from 'jquery';
 import sun from './sun.png';
 import moon from './moon.png';
 import settings from './settings.png';
 import settingsFull from './settingsFull.png';
+import bg from './bg.png';
 
 function App() {
 
   $(() => {
 
     //preloader
-    $(".darkmode-container, .settings").css("opacity", "1");
+    $(".darkmode-container, .settings, .bg-container").css("opacity", "1");
     setTimeout(() => {
       $(".darkmode-container, #darkmode-switch").css("pointer-events", "all");
     }, 2200);
@@ -40,20 +41,51 @@ function App() {
     //settings
     $(".settings-wheel").on("click", () => {
       if ($(".settings").hasClass("active")) {
+        $(".settings").removeClass("active");
         //settings-icon
         $(".settings-wheel-fill").css("opacity", "0");
-        $(".settings").removeClass("active");
         $(".settings-wheel").css("transform", "rotate(0deg)");
         //main
         $(".settings-bg").css("left", "100vw");
       } else {
+        $(".settings").addClass("active");
         //settings-icon
         $(".settings-wheel-fill").css("opacity", ".2");
-        $(".settings").addClass("active");
         $(".settings-wheel").css("transform", "rotate(27deg)");
         //main
         $(".settings-bg").css("left", "0");
       }
+    });
+
+    //bg
+    var initialRotationDuration = 4000;
+    var rotationInterval;
+    
+    function rotateElement() {
+      $(".bg").css({
+        "transition-duration": "0ms",
+        "transform": `rotate(0deg)`
+      });
+
+      setTimeout(() => {
+        $(".bg").css({
+          "transition-duration": initialRotationDuration + "ms",
+          "transform": `rotate(360deg)`
+        });
+      }, 5);
+
+      rotationInterval = setTimeout(rotateElement, initialRotationDuration);
+    }
+    
+    rotateElement();
+    
+    $(".settings").on("click", function() {
+      if ($(".settings").hasClass("active")) {
+        $(".bg").css("top", "calc(50vh - 0.5 * 80vw)");
+      } else {
+        $(".bg").css("top", "0");
+      }
+
     });
 
   })
@@ -85,8 +117,11 @@ function App() {
       <img alt="settings wheel filled" className="settings-wheel settings-wheel-fill" src={settingsFull}/>
     </div>
 
-
+    <div className="bg-container">
+      <img alt="blurred circles" className="bg" src={bg}/>
     </div>
+
+  </div>
   );
 }
 

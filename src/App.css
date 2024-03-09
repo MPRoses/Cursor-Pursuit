@@ -129,7 +129,7 @@ label {
   filter: invert(1);
 }
 
-.settings {
+.settings, .bg-container {
   opacity: 0;
   transition: opacity 1s var(--amazing-cubic) 2s;
 }
@@ -161,4 +161,14 @@ label {
   left: 100vw;
   top: 0;
   transition: left .73s cubic-bezier(.84,.35,0,1.01);
+}
+.bg {
+  width: 80vw;
+  height: 80vw;
+  position: absolute;
+  top: 0;
+  left: calc(50vw - 0.5 * 80vw);
+  transform: rotate(0deg);
+  z-index: 1;
+  transition: transform cubic-bezier(.71,.19,.43,.96), top .4s ease-in-out;
 }
