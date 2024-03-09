@@ -13,6 +13,15 @@ import bg from './bg.png';
 function App() {
 
   $(() => {
+    
+    // highscore
+    if (!localStorage.getItem("highscore")) {
+      localStorage.setItem("highscore", "");
+      $(".scoreboard p").css("opacity", "0");
+    } else {
+      $(".scoreboard p").eq(0).text(`HIGHSCORE: ${localStorage.getItem("highscore")}`);
+      $(".scoreboard p").eq(0).css("opacity", "1");
+    }
 
     //difficulty
     if (!localStorage.getItem("difficulty")) {
@@ -47,17 +56,20 @@ function App() {
       $(".settings-wheel, .start-button, .orb").css("filter", "invert(1)");
       $("#darkmode-switch").prop("checked", true);
       $(".title").css("color", "white");
+      $(".scoreboard p").css("color", "white");
     }
 
     $("#darkmode-switch").on("change", function() {
       if ($("#darkmode-switch").is(":checked")) {
         $(".title").css("color", "white");
+        $(".scoreboard p").css("color", "white");
         $(".settings-bg").css(".background-color", "rgba(158, 128, 204, 0.795)");
         $(".settings-wheel, .start-button, .orb").css("filter", "invert(1)");
         $("body").css("background-color", "#0a0b1d");
         localStorage.setItem("darkmode", "true");
       } else {
         $(".title").css("color", "black");
+        $(".scoreboard p").css("color", "black");
         $(".settings-bg").css(".background-color", "rgba(221, 201, 255, 0.493)");
         $(".settings-wheel, .start-button, .orb").css("filter", "invert(0)");
         $("body").css("background-color", "white");
@@ -136,28 +148,20 @@ function App() {
       $(this).addClass("option-selected");
       localStorage.setItem("difficulty", `${$(this).text()}`)
     })
-    
-    //start button
-    $(".start-button").on(("click"), function() {
-      $(".word").css("transition", "transform 2s var(--amazing-cubic)")
-      $(".word").eq(0).css("transform", "translateX(-100vw)");
-      $(".word").eq(1).css("transform", "translateX(100vw)");
-      $(".start-button").css({
-        "transform": "translateY(30vh)",
-        "opacity": "0",
-        "pointer-events": "none"
-      });
-      startGame();
-    })
+  
 
     //startGame() and game functionality
     
     var activeGame = false;
     var totalScore = 0;
+    var totalWon = 0;
+    var totalLost = 0;
+    var avgReactionSpeed = 0;
 
     function startGame() {
       activeGame = true;
-    
+
+      $(".orb").css("display", "block");
       var orb = $(".orb");
       var tempOrb = orb.clone();
       $(".orb").css("display", "none");
@@ -165,7 +169,8 @@ function App() {
     
       function gameLoop() {
         if (!activeGame) {
-          return; // Stop the loop if activeGame is false
+          resetToStart();
+          return;
         }
     
         AmountOfOrbs++;
@@ -177,16 +182,29 @@ function App() {
     
         if (!localStorage.getItem("darkmode")) {
           newOrb.css("filter", "invert(0)");
+        } else {
+          newOrb.css("filter", "invert(1)");
         }
     
         $(".orb-container").prepend(newOrb);
+        
+        var startTime = Date.now();
     
         var wasTriggered = false;
         newOrb.on("mouseenter", function() {
           wasTriggered = true;
           this.remove();
           totalScore++;
-          console.log(totalScore);
+          totalWon++;
+
+          var endTime = Date.now();
+          var reactionSpeed = endTime - startTime;
+          avgReactionSpeed += reactionSpeed;
+
+          $(".scoreboard p").eq(1).text(`POINTS: ${totalScore}`);
+          $(".scoreboard p").eq(3).text(`ORBS COLLECTED: ${totalWon}`);
+          $(".scoreboard p").eq(4).text(`AVG REACTION SPEED: ${Math.round(avgReactionSpeed / (totalWon + totalLost))}ms`);
+
         });
     
         setTimeout(() => {
@@ -196,8 +214,39 @@ function App() {
           setTimeout(() => {
             newOrb.off("mouseenter");
             newOrb.remove();
-            if (!wasTriggered) {
-              activeGame = false;
+            if (!wasTriggered && activeGame) {
+              totalLost++;
+              totalScore -= 2;
+
+              var endTime = Date.now();
+              var reactionSpeed = endTime - startTime;
+              avgReactionSpeed += reactionSpeed;
+
+              $(".scoreboard p").eq(1).text(`POINTS: ${totalScore}`);
+              $(".scoreboard p").eq(2).text(`ORBS LOST: ${totalLost}`);
+              $(".scoreboard p").eq(4).text(`AVG REACTION SPEED: ${Math.round(avgReactionSpeed / (totalWon + totalLost))}ms`);
+
+              $("body").css("background-color", "red");
+
+              setTimeout(() => {
+                if (!localStorage.getItem("darkmode")) {
+                  $("body").css("background-color", "white");
+                } else {
+                  $("body").css("background-color", "#0a0b1d");
+                }
+              }, 200);
+
+
+              if (totalLost === 5) { // game is lost
+                activeGame = false;
+                
+                if (localStorage.getItem("highscore") < totalScore) {
+                  localStorage.setItem("highscore", `${totalScore}`);
+                  $(".scoreboard p").eq(0).text(`HIGHSCORE: ${totalScore}`);
+                }
+                
+                $(".orb").off("mouseenter");
+              }
             }
           }, 4000);
         }, 200);
@@ -208,6 +257,43 @@ function App() {
       // Start the initial game loop
       gameLoop();
     }
+
+    function resetToStart() {
+      $(".word").eq(0).css("transform", "");
+      $(".word").eq(1).css("transform", "");
+      $(".start-button").css({
+        "transform": "",
+        "opacity": "1",
+        "pointer-events": "all"
+      });
+      $(".word").css("transition", "transform .73s var(--amazing-cubic)");
+      
+    }
+
+
+    //start button
+    $(".start-button").on(("click"), function() {
+      $(".scoreboard p").eq(1).text(`POINTS:`);
+      $(".scoreboard p").eq(2).text(`ORBS LOST:`);
+      $(".scoreboard p").eq(3).text(`ORBS LOST:`);
+
+      $(".scoreboard p").css("opacity", "1");
+
+      $(".word").css("transition", "transform 2s var(--amazing-cubic)")
+      $(".word").eq(0).css("transform", "translateX(-100vw)");
+      $(".word").eq(1).css("transform", "translateX(100vw)");
+      $(".start-button").css({
+        "transform": "translateY(30vh)",
+        "opacity": "0",
+        "pointer-events": "none"
+      });
+       
+      totalScore = 0;
+      totalWon = 0;
+      totalLost = 0;
+    
+      startGame();
+    })
 
     function generatePoint() {
       const left = Math.floor(Math.random() * 91) + 5;
@@ -332,6 +418,19 @@ function App() {
         <img alt="spherical object" className="orb" src={orb}/>
       </div>
 
+
+      <div className="scoreboard">
+        <p>HIGHSCORE: </p>
+        <br></br>
+        <br></br>
+        <p>POINTS: </p>
+        <br></br>
+        <p>ORBS LOST: </p>
+        <br></br>
+        <p>ORBS COLLECTED: </p>
+        <br></br>
+        <p>AVG REACTION SPEED: </p>
+      </div>
 
 
 

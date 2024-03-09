@@ -290,7 +290,6 @@ label {
   cursor:default;
 }
 
-
 @keyframes jumpItem {
   0% {
     transform: translateY(0px);
@@ -331,8 +330,31 @@ label {
   opacity: 0;
   pointer-events: all;
   z-index: 10;
-
 }
+
 .orb:hover {
   cursor: pointer;
+}
+
+.scoreboard {
+  position: fixed;
+  top: 3vh;
+  left: 3vw;
+  font-family: "Just Another Hand", sans-serif;
+  font-size: 20px;
+}
+.scoreboard p {
+  line-height: 0px;
+  margin: 0;
+  padding: 0;
+  opacity: 0;
+  transition: opacity .73s var(--amazing-cubic) 2s;
+}
+
+.scoreboard p:nth-child(6) {
+  transition: opacity .73s var(--amazing-cubic) 2.1s;
+}
+
+.scoreboard p:nth-child(8) {
+  transition: opacity .73s var(--amazing-cubic) 2.2s;
 }
