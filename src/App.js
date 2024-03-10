@@ -9,6 +9,22 @@ import settings from './settings.png';
 import orb from './orb.png';
 import settingsFull from './settingsFull.png';
 import bg from './bg.png';
+import bgsettings1 from './bgsettings1.png';
+import bgsettings2 from './bgsettings2.png';
+import cursor1 from './cursor1.png';
+import cursor2 from './cursor2.png';
+
+import cursor_1 from './cursor_1.png';
+import cursor_2 from './cursor_2.png';
+import cursor_3 from './cursor_3.png';
+import cursor_4 from './cursor_4.png';
+import cursor_5 from './cursor_5.png';
+
+import ball_1 from './ball_1.png';
+import ball_2 from './ball_2.png';
+import ball_3 from './ball_3.png';
+import ball_4 from './ball_4.png';
+import ball_5 from './ball_5.png';
 
 function App() {
 
@@ -77,6 +93,41 @@ function App() {
       }
     });
 
+    //disable bg
+
+    if (localStorage.getItem("background")) {
+      $("#custom-switch").prop("checked", true);
+      $(".bg-container").css("transition", "opacity 1s var(--amazing-cubic)");
+      $(".bg-container").css("opacity", "0");
+    }
+
+    $("#custom-switch").on("change", function() {
+      if ($("#custom-switch").is(":checked")) {
+        $(".bg-container").css("transition", "opacity 1s var(--amazing-cubic)");
+        $(".bg-container").css("opacity", "0");
+        localStorage.setItem("background", "false");
+      } else {
+        $(".bg-container").css("opacity", "1");
+        localStorage.removeItem("background");
+      }
+    });
+
+    // cursor mode
+
+    if (localStorage.getItem("cursorModeClick")) {
+      $("#custom2-switch").prop("checked", true);
+    }
+
+    $("#custom2-switch").on("change", function() {
+      if ($("#custom2-switch").is(":checked")) {
+        localStorage.setItem("cursorModeClick", "true");
+      } else {
+        localStorage.removeItem("cursorModeClick");
+      }
+    });
+
+    
+    
     //settings
     $(".settings-wheel").on("click", function() {
       if ($(".settings").hasClass("active")) {
@@ -92,7 +143,19 @@ function App() {
           "top": "0",
           "pointer-events": "none"
         });
-        $(".option").css("transform", "translateY(-200px)");
+        $(".circle-selector").css("transition", "transform 1s var(--amazing-cubic), filter 1s var(--amazing-cubic)");
+
+        $(".circle-selector").css("transform", "translateX(10vw)");
+        $(".selector-left").css("transform", "translateX(-10vw)");
+        $(".circle-selector").css("filter", "opacity(0)");
+
+        $(".circle-item").css("transform", "translateX(5vw)");
+        $(".circle-item-left").css("transform", "translateX(-5vw)");
+
+
+
+        $(".custom-container").attr("style", "transition: opacity .5s cubic-bezier(.2,.9,.45,1), bottom 1s cubic-bezier(.2,.9,.45,1) .3s; opacity: 0; pointer-events: none; bottom: -3vh");
+        $(".custom2-container").attr("style", "transition: opacity .5s cubic-bezier(.2,.9,.45,1), bottom 1s cubic-bezier(.2,.9,.45,1) .3s; opacity: 0; pointer-events: none; bottom: -6vh");
       } else {
         $(".settings").addClass("active");
         //settings-icon
@@ -107,6 +170,17 @@ function App() {
           "pointer-events": "all"
         });
         $(".option").css("transform", "translateY(0)");
+        $(".circle-selector").css("transition", "transform 1s var(--amazing-cubic) .8s, filter 1s var(--amazing-cubic) .8s");
+        $(".circle-selector, .selector-left").css("transform", "translateX(0)");
+        $(".circle-selector").css("filter", "opacity(1)");
+
+        setTimeout(() => {
+          $(".circle-item-left, .circle-item").css("transform", "translateX(0)")
+        }, 800);
+        
+
+        $(".custom-container").attr("style", "transition: opacity .5s cubic-bezier(.2,.9,.45,1) 1s, bottom 1s cubic-bezier(.2,.9,.45,1) .5s; opacity: 1 !important; pointer-events: all !important; bottom: calc(6vh + 25px)");
+        $(".custom2-container").attr("style", "transition: opacity .5s cubic-bezier(.2,.9,.45,1) 1s, bottom 1s cubic-bezier(.2,.9,.45,1) .5s; opacity: 1 !important; pointer-events: all !important; bottom: calc(12vh + 25px)");
       }
     });
 
@@ -147,7 +221,65 @@ function App() {
       $(".option").removeClass("option-selected");
       $(this).addClass("option-selected");
       localStorage.setItem("difficulty", `${$(this).text()}`)
+    });
+
+    $(".circle-item-left").on("click", function() {
+      $(".circle-item-left").removeClass("circle-item-active");
+      $(this).addClass("circle-item-active");
     })
+
+    $(".circle-item-right").on("click", function() {
+      $(".circle-item-right").removeClass("circle-item-active");
+      $(this).addClass("circle-item-active");
+      changeCursor($(this).index(".circle-item-right"));
+
+    })
+
+    var cursorDisabled = false;
+
+    function changeCursor(index) {
+
+      if (index === 0) {
+        $("html").attr("style", "cursor: unset !important")
+        cursorDisabled = false;
+      } else {
+        $("html").attr("style", "cursor: none !important")
+        cursorDisabled = true;
+      }
+    
+      $(".custom-cursor").removeClass("cursor-active");
+      $(".custom-cursor").eq(index).addClass("cursor-active");
+    }
+
+    $(window).on("mousemove", (e) => {
+      $(".custom-cursor").attr("style", `left: ${e.clientX}px; top: ${e.clientY}px`);
+    }) 
+
+    $(".hoverable").on("mouseenter", function() {
+      console.log(cursorDisabled);
+      if (!cursorDisabled) {
+        $(this).css("cursor", "pointer");
+      }
+    })
+
+    $(".hoverable").on("mouseleave", function() {
+      if (!cursorDisabled) {
+        $(this).css("cursor", "unset");
+      }
+    })
+
+    $(".defaultcursor").on("mouseenter", function() {
+      if (!cursorDisabled) {
+        $(this).css("cursor", "default");
+      }
+    })
+
+    $(".defaultcursor").on("mouseleave", function() {
+      if (!cursorDisabled) {
+        $(this).css("cursor", "unset");
+      }
+    })
+    
   
 
     //startGame() and game functionality
@@ -157,6 +289,7 @@ function App() {
     var totalWon = 0;
     var totalLost = 0;
     var avgReactionSpeed = 0;
+    var margin = 0;
 
     function startGame() {
       activeGame = true;
@@ -189,17 +322,27 @@ function App() {
         $(".orb-container").prepend(newOrb);
         
         var startTime = Date.now();
+        var marginOfError = Date.now();
     
         var wasTriggered = false;
-        newOrb.on("mouseenter", function() {
+
+        var cursorMode = "";
+
+        if ($("#custom2-switch").is(":checked")) {
+          cursorMode = "click";
+        } else {
+          cursorMode = "mouseenter";
+        }
+
+        newOrb.on(cursorMode, function() {
           wasTriggered = true;
           this.remove();
           totalScore++;
           totalWon++;
 
           var endTime = Date.now();
-          var reactionSpeed = endTime - startTime;
-          avgReactionSpeed += reactionSpeed;
+          var reactionSpeed = endTime - startTime - 200 - margin;
+          avgReactionSpeed += reactionSpeed; 
 
           $(".scoreboard p").eq(1).text(`POINTS: ${totalScore}`);
           $(".scoreboard p").eq(3).text(`ORBS COLLECTED: ${totalWon}`);
@@ -210,7 +353,11 @@ function App() {
         setTimeout(() => {
           newOrb.css("transform", "scale(0) rotate(360deg)");
           newOrb.css("opacity", "1");
-    
+          
+          var marginOfErrorExit = Date.now();
+
+          var margin = marginOfErrorExit - marginOfError - 200;
+
           setTimeout(() => {
             newOrb.off("mouseenter");
             newOrb.remove();
@@ -219,11 +366,11 @@ function App() {
               totalScore -= 2;
 
               var endTime = Date.now();
-              var reactionSpeed = endTime - startTime;
+              var reactionSpeed = endTime - startTime - 200 - margin;
               avgReactionSpeed += reactionSpeed;
 
               $(".scoreboard p").eq(1).text(`POINTS: ${totalScore}`);
-              $(".scoreboard p").eq(2).text(`ORBS LOST: ${totalLost}`);
+              $(".scoreboard p").eq(2).text(`ORBS LOST: ${totalLost}/5`);
               $(".scoreboard p").eq(4).text(`AVG REACTION SPEED: ${Math.round(avgReactionSpeed / (totalWon + totalLost))}ms`);
 
               $("body").css("background-color", "red");
@@ -261,6 +408,15 @@ function App() {
     function resetToStart() {
       $(".word").eq(0).css("transform", "");
       $(".word").eq(1).css("transform", "");
+
+      setTimeout(() => {
+        if ($(window).width() < 1200) {
+          $(".scoreboard p").css("opacity", "0");
+          $(".scoreboard p").eq(0).css("opacity", "1");
+        }
+      }, 500);
+
+
       $(".start-button").css({
         "transform": "",
         "opacity": "1",
@@ -275,7 +431,7 @@ function App() {
     $(".start-button").on(("click"), function() {
       $(".scoreboard p").eq(1).text(`POINTS:`);
       $(".scoreboard p").eq(2).text(`ORBS LOST:`);
-      $(".scoreboard p").eq(3).text(`ORBS LOST:`);
+      $(".scoreboard p").eq(3).text(`ORBS COLLECTED:`);
 
       $(".scoreboard p").css("opacity", "1");
 
@@ -296,18 +452,21 @@ function App() {
     })
 
     function generatePoint() {
-      const left = Math.floor(Math.random() * 91) + 5;
-      const top = Math.floor(Math.random() * 91) + 5;
+      const left = Math.floor(Math.random() * 80) + 10;
+      const top = Math.floor(Math.random() * 80) + 10;
  
       return { left: left + "vw", top: top + "vh" }
     }
 
     //main title jumping animation
+
     $(".title-jump").on("mouseenter", function() {
-      $(this).css("animation", "jumpItem 1s ease-in-out 1");
-      setTimeout(() => {
-        $(this).css("animation", "");
-      }, 1000);
+      if ($(this).css("animation") === "none 0s ease 0s 1 normal none running" || $(this).css("animation") === "") {
+        $(this).css("animation", "jumpItem 1s ease-in-out 1");
+        setTimeout(() => {
+          $(this).css("animation", "");
+        }, 1000);
+      }      
     })
 
     //anime animations
@@ -353,6 +512,7 @@ function App() {
         <div className="preloader-circle preloader-circle2"></div>
       </div>
 
+
       <input type="checkbox" id="darkmode-switch" />
       <div className="darkmode-container">
         <div className="darkmode-body">
@@ -360,25 +520,96 @@ function App() {
             <label htmlFor="darkmode-switch">
               <div className="darkmode-toggle"></div>
               <div className="darkmode-labels">
-                <img alt="sun" className="darkmode-label-sun" src={sun}/>
-                <img alt="moon" className="darkmode-label-moon" src={moon}/>
+                <img alt="sun" className="darkmode-label-sun" src={sun} />
+                <img alt="moon" className="darkmode-label-moon" src={moon} />
               </div>
             </label>
           </div>
         </div>
+      </div>
+
+      <input type="checkbox" id="custom-switch" /> <div className="custom-container"> <div className="custom-body">
+        <div className="custom-content">
+          <label htmlFor="custom-switch">
+            <div className="custom-toggle"></div>
+            <div className="custom-labels">
+              <img alt="sun" className="custom-label-sun" src={bgsettings1} />
+              <img alt="moon" className="custom-label-moon" src={bgsettings2} />
+            </div>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <input type="checkbox" id="custom2-switch" /> <div className="custom2-container"> <div className="custom2-body">
+        <div className="custom2-content">
+          <label htmlFor="custom2-switch">
+            <div className="custom2-toggle"></div>
+            <div className="custom2-labels">
+              <img alt="sun" className="custom2-label-sun" src={cursor1} />
+              <img alt="moon" className="custom2-label-moon" src={cursor2} />
+            </div>
+          </label>
+        </div>
+      </div>
     </div>
 
     <div className="settings">
       <p className="anime-container">difficulty</p>
       <div className="settings-content">
-        <div className="option option-easy option-selected">easy</div>
-        <div className="option option-medium">less easy</div>
-        <div className="option option-hard">kinda hard</div>
-        <div className="option option-help">why are we here</div>
+        <div className="option hoverable option-easy option-selected">easy</div>
+        <div className="option hoverable option-medium">less easy</div>
+        <div className="option hoverable option-hard">kinda hard</div>
+        <div className="option hoverable option-help">why are we here</div>
       </div>
       <div className="settings-bg"></div>
-      <img alt="settings" className="settings-wheel" src={settings}/>
+      <img alt="settings" className="settings-wheel hoverable" src={settings}/>
       <img alt="settings wheel filled" className="settings-wheel settings-wheel-fill" src={settingsFull}/>
+    </div>
+
+
+    <div className="circle-selector selector-right">
+      <div className="circle-item hoverable circle-item-right circle-item-active">
+        <img alt="cursor" className="circle-item-cursor" src={cursor_1}/>
+      </div>
+      <div className="circle-item hoverable circle-item-right ">
+        <img alt="cursor" className="circle-item-cursor" src={cursor_2}/>
+      </div>
+      <div className="circle-item hoverable circle-item-right">
+        <img alt="cursor" className="circle-item-cursor" src={cursor_3}/> 
+      </div>
+      <div className="circle-item hoverable  circle-item-right">
+        <img alt="cursor" className="circle-item-cursor" src={cursor_4}/>
+      </div>
+      <div className="circle-item hoverable circle-item-right">
+        <img alt="cursor" className="circle-item-cursor" src={cursor_5}/>
+      </div>
+    </div>
+
+    <div className="circle-selector selector-left">
+      <div className="circle-item hoverable circle-item-left circle-item-active">
+        <img alt="ball" className="circle-item-ball" src={ball_1}/>
+      </div>
+      <div className="circle-item hoverable circle-item-left" >
+        <img alt="ball" className="circle-item-ball" src={ball_2}/>
+      </div>
+      <div className="circle-item hoverable circle-item-left">
+        <img alt="ball" className="circle-item-ball small-ball" src={ball_3}/>
+      </div>
+      <div className="circle-item hoverable circle-item-left" >
+        <img alt="ball" className="circle-item-ball small-ball" src={ball_4}/>
+      </div>
+      <div className="circle-item hoverable circle-item-left">
+        <img alt="ball" className="circle-item-ball" src={ball_5}/>
+      </div>
+    </div>
+
+    <div className="cursor">
+      <img alt="cursor" className="custom-cursor empty-cursor" src={cursor_1} />
+      <img alt="cursor" className="custom-cursor" src={cursor_2} />
+      <img alt="cursor" className="custom-cursor" src={cursor_3} />
+      <img alt="cursor" className="custom-cursor" src={cursor_4} />
+      <img alt="cursor" className="custom-cursor" src={cursor_5} />
     </div>
 
     <div className="bg-container">
@@ -387,7 +618,7 @@ function App() {
 
 
     <div className="main">
-      <div className="title anime-container2">
+      <div className="title defaultcursor anime-container2">
       <span className="word">
         <div className="title-jump">C</div>
         <div className="title-jump">U</div>
@@ -408,14 +639,14 @@ function App() {
       </span>
       </div>
       <div className="start-container">
-        <img alt="start button" className="start-button" src={start} />
+        <img alt="start button" className="start-button hoverable" src={start} />
       </div>
 
 
 
 
       <div className="orb-container">
-        <img alt="spherical object" className="orb" src={orb}/>
+        <img alt="spherical object" className="orb hoverable" src={orb}/>
       </div>
 
 
@@ -431,11 +662,6 @@ function App() {
         <br></br>
         <p>AVG REACTION SPEED: </p>
       </div>
-
-
-
-
-
     </div>
 
 

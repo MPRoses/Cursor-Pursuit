@@ -52,31 +52,46 @@ body {
     opacity: 0;
   }
 }
-
-#darkmode-switch {
-  pointer-events: none;
+#darkmode-switch,
+#custom-switch, #custom2-switch {
+  pointer-events: all;
 }
 
-.darkmode-container {
+.darkmode-container,
+.custom-container, .custom2-container {
   position: fixed;
   height: 30px;
   width: 100px;
-  bottom: 3vh;
   left: 3vw;
-  opacity: 0;
   z-index: 100;
-  transition: opacity 1s var(--amazing-cubic) 2s;
+  transition: opacity 1s var(--amazing-cubic) 2s, bottom 1s var(--amazing-cubic) 2s;
+  pointer-events: all;
+}
+
+.darkmode-container {
+  bottom: 3vh;
+}
+
+.custom-container, .custom2-container {
+  bottom: -3vh;
+  opacity: 0;
   pointer-events: none;
 }
 
-.darkmode-content {
+.custom2-container {
+  bottom: -6vh;
+}
+
+.darkmode-content,
+.custom-content, .custom2-content {
   display: flex;
   flex-direction: column;
   width: 70%;
 }
 
 label,
-.darkmode-toggle {
+.darkmode-toggle,
+.custom-toggle, .custom2-toggle { 
   height: 30px;
   border-radius: 100px;
 }
@@ -86,10 +101,18 @@ label {
   background-color: rgba(134, 134, 134, 0.158);
   border-radius: 100px;
   position: relative;
-  cursor: pointer;
 }
 
-.darkmode-toggle {
+label:hover {
+  cursor: none;
+}
+
+.settings-wheel:hover {
+  cursor: none;
+}
+
+.darkmode-toggle,
+.custom-toggle, .custom2-toggle {
   position: absolute;
   width: 50%;
   background-color: #fff;
@@ -97,14 +120,16 @@ label {
   transition: transform .3s var(--amazing-cubic);
 }
 
-.darkmode-label-sun {
+.darkmode-label-sun,
+.custom-label-sun, .custom2-label-sun { 
   position: absolute;
   width: 24px;
   left: 13px;
   top: 3px;
-
 }
-.darkmode-label-moon {
+
+.darkmode-label-moon,
+.custom-label-moon, .custom2-label-moon { 
   position: absolute;
   width: 20px;
   left: 65px;
@@ -113,7 +138,8 @@ label {
   filter: invert(1);
 }
 
-.darkmode-label-dark {
+.darkmode-label-dark,
+.custom-label-dark, .custom2-label-dark {
   opacity: .5;
 }
 
@@ -121,12 +147,14 @@ label {
   display: none;
 }
 
-[type="checkbox"]:checked + .darkmode-container .darkmode-toggle {
+[type="checkbox"]:checked + .darkmode-container .darkmode-toggle, /* Changed class names */
+[type="checkbox"]:checked + .custom-container .custom-toggle { /* Changed class names */
   transform: translateX(100%);
   background-color: #000111;
 }
-[type="checkbox"]:checked + .darkmode-container .darkmode-label-moon {
-  filter: invert(1);
+[type="checkbox"]:checked + .custom2-container .custom2-toggle { /* Changed class names */
+  transform: translateX(100%);
+  background-color: #000111;
 }
 
 .settings, .bg-container, .title {
@@ -141,10 +169,6 @@ label {
   right: 3vw;
   opacity: 1;
   transition: transform .73s var(--amazing-cubic);
-}
-
-.settings-wheel:hover {
-  cursor: pointer;
 }
 
 .settings-wheel-fill {
@@ -229,9 +253,7 @@ label {
   opacity: 1;
 }
 .option:hover {
-  cursor: pointer;
   opacity: 1;
-
 }
 
 .settings-content p {
@@ -286,9 +308,6 @@ label {
   transition: transform .73s var(--amazing-cubic);
 }
 
-.title-jump:hover {
-  cursor:default;
-}
 
 @keyframes jumpItem {
   0% {
@@ -311,7 +330,6 @@ label {
 }
 
 .start-button:hover {
-  cursor: pointer;
   opacity: .4;
   transform: scale(1.2);
 }
@@ -330,10 +348,6 @@ label {
   opacity: 0;
   pointer-events: all;
   z-index: 10;
-}
-
-.orb:hover {
-  cursor: pointer;
 }
 
 .scoreboard {
@@ -357,4 +371,120 @@ label {
 
 .scoreboard p:nth-child(8) {
   transition: opacity .73s var(--amazing-cubic) 2.2s;
+}
+
+.scoreboard p:nth-child(10) {
+  transition: opacity .73s var(--amazing-cubic) 2.3s;
+}
+
+.circle-selector {
+  width: 40px;
+  height: calc(5 * 40px + 8vh);
+  position: fixed;
+  right: 3vw;
+  top: calc(50vh - 0.5 * (5*40px + 8vh));
+  pointer-events: all;
+  transform: translateX(10vw);
+  transition: transform 1s var(--amazing-cubic) 1.2s, filter 1s var(--amazing-cubic) 1.2s;
+  filter: opacity(0);
+}
+
+.selector-left {
+  left: 3vw;
+  transform: translateX(-10vw);
+}
+
+.circle-item {
+  width: 40px;
+  height: 40px;
+  background-color: white;
+  position: relative;
+  margin-bottom: 2vh;
+  border-radius: 100%;
+  opacity: .4;
+  transition: opacity .73s var(--amazing-cubic), transform 1s var(--amazing-cubic);
+  transform: translateX(5vw);
+}
+
+.circle-item:nth-child(1) {
+  transition: opacity .73s var(--amazing-cubic), transform 1s var(--amazing-cubic) .4s;
+}
+.circle-item:nth-child(2) {
+  transition: opacity .73s var(--amazing-cubic), transform 1s var(--amazing-cubic) .3s;
+}
+.circle-item:nth-child(3) {
+  transition: opacity .73s var(--amazing-cubic), transform 1s var(--amazing-cubic) .2s;
+}
+.circle-item:nth-child(4)  {
+  transition: opacity .73s var(--amazing-cubic), transform 1s var(--amazing-cubic) .1s;
+}
+.circle-item:nth-child(5)  {
+  transition: opacity .73s var(--amazing-cubic), transform 1s var(--amazing-cubic);
+}
+
+.circle-item-left {
+  transform: translateX(-5vw);
+}
+
+.selector-left .circle-item:nth-child(1) {
+  transition: opacity .73s var(--amazing-cubic), transform 1s var(--amazing-cubic);
+}
+.selector-left  .circle-item:nth-child(2) {
+  transition: opacity .73s var(--amazing-cubic), transform 1s var(--amazing-cubic) .1s;
+}
+.selector-left  .circle-item:nth-child(3) {
+  transition: opacity .73s var(--amazing-cubic), transform 1s var(--amazing-cubic) .2s;
+}
+.selector-left  .circle-item:nth-child(4)  {
+  transition: opacity .73s var(--amazing-cubic), transform 1s var(--amazing-cubic) .3s;
+}
+.selector-left  .circle-item:nth-child(5)  {
+  transition: opacity .73s var(--amazing-cubic), transform 1s var(--amazing-cubic) .4s;
+}
+
+
+.circle-item:hover {
+  opacity: 1;
+}
+
+.circle-item-active {
+  opacity: 1;
+}
+
+.custom-cursor {
+  position: fixed;
+  top: 10vh;
+  left: 10vw;
+  width: 24px;
+  height: 24px;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 10000;
+}
+.custom-cursor:nth-child(3), .custom-cursor:nth-child(4) {
+  transform: translate(-50%, -50%);
+}
+
+.cursor-active {
+  opacity: 1;
+}
+.empty-cursor {
+  opacity: 0 !important;
+}
+.circle-item-cursor {
+  width: 24px;
+  position: relative;
+  top: calc(50% - 12px);
+  left: calc(50% - 12px);
+  pointer-events: none;
+}
+.circle-item-ball {
+  position: relative;
+  top: calc(50% - 11px);
+  pointer-events: none;
+}
+.small-ball {
+  position: relative;
+  top: calc(50% - 12px);
+  left: calc(50% - 12px);
 }
