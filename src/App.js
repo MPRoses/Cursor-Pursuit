@@ -6,7 +6,6 @@ import sun from './sun.png';
 import moon from './moon.png';
 import start from './start.png';
 import settings from './settings.png';
-import orb from './orb.png';
 import settingsFull from './settingsFull.png';
 import bg from './bg.png';
 import bgsettings1 from './bgsettings1.png';
@@ -26,6 +25,12 @@ import ball_3 from './ball_3.png';
 import ball_4 from './ball_4.png';
 import ball_5 from './ball_5.png';
 
+import orb from './orb.png';
+import orb2 from './orb2.png';
+import orb3 from './orb3.png';
+import orb4 from './orb4.png';
+import orb5 from './orb5.png';
+
 function App() {
 
   $(() => {
@@ -37,6 +42,24 @@ function App() {
     } else {
       $(".scoreboard p").eq(0).text(`HIGHSCORE: ${localStorage.getItem("highscore")}`);
       $(".scoreboard p").eq(0).css("opacity", "1");
+    }
+    //cursor
+    var cursorDisabled = false;
+
+    if (localStorage.getItem("cursor")) {
+      $(".circle-item-right").removeClass("circle-item-active");
+      $(".circle-item-right").eq(localStorage.getItem("cursor")).addClass("circle-item-active");
+
+      changeCursor(localStorage.getItem("cursor"));
+      $("html").attr("style", "cursor: none !important");
+      cursorDisabled = true;
+    }
+
+    //ball
+    if (localStorage.getItem("ball")) {
+      $(".circle-item-left").removeClass("circle-item-active");
+      $(".circle-item-left").eq(localStorage.getItem("ball")).addClass("circle-item-active");
+      changeBall(localStorage.getItem("ball"));
     }
 
     //difficulty
@@ -73,10 +96,16 @@ function App() {
       $("#darkmode-switch").prop("checked", true);
       $(".title").css("color", "white");
       $(".scoreboard p").css("color", "white");
+      if (localStorage.getItem("cursor") === "2") {
+        $(".custom-cursor").css("filter", "invert(1)");
+      }
     }
 
     $("#darkmode-switch").on("change", function() {
       if ($("#darkmode-switch").is(":checked")) {
+        if (localStorage.getItem("cursor") === "2") {
+          $(".custom-cursor").css("filter", "invert(1)");
+        }
         $(".title").css("color", "white");
         $(".scoreboard p").css("color", "white");
         $(".settings-bg").css(".background-color", "rgba(158, 128, 204, 0.795)");
@@ -84,6 +113,7 @@ function App() {
         $("body").css("background-color", "#0a0b1d");
         localStorage.setItem("darkmode", "true");
       } else {
+        $(".custom-cursor").css("filter", "invert(0)");
         $(".title").css("color", "black");
         $(".scoreboard p").css("color", "black");
         $(".settings-bg").css(".background-color", "rgba(221, 201, 255, 0.493)");
@@ -224,39 +254,116 @@ function App() {
     });
 
     $(".circle-item-left").on("click", function() {
+      if (activeGame) {
+        return;
+      }
       $(".circle-item-left").removeClass("circle-item-active");
       $(this).addClass("circle-item-active");
+      changeBall($(this).index(".circle-item-left"));
     })
+
+    function changeBall(index) {
+      $(".orb-container").empty();
+
+      if (index === 0) {
+        if (localStorage.getItem("ball")) {
+          localStorage.removeItem("ball");
+        }
+      } else {
+        localStorage.setItem("ball", `${index}`);
+      }
+
+      var ball = $(".orb-hold-container").children().eq(index).clone();
+      ball.addClass("orb hoverable");
+      $(".orb-container").prepend(ball);
+    }
 
     $(".circle-item-right").on("click", function() {
       $(".circle-item-right").removeClass("circle-item-active");
       $(this).addClass("circle-item-active");
       changeCursor($(this).index(".circle-item-right"));
-
     })
 
-    var cursorDisabled = false;
-
     function changeCursor(index) {
-
+      
       if (index === 0) {
-        $("html").attr("style", "cursor: unset !important")
+        $("html").attr("style", "cursor: unset !important");
         cursorDisabled = false;
+        if (localStorage.getItem("cursor")) {
+          localStorage.removeItem("cursor");
+        }
       } else {
-        $("html").attr("style", "cursor: none !important")
+        $("html").attr("style", "cursor: none !important");
         cursorDisabled = true;
+        localStorage.setItem("cursor", `${index}`);
       }
     
       $(".custom-cursor").removeClass("cursor-active");
       $(".custom-cursor").eq(index).addClass("cursor-active");
     }
 
+    let lastExecutionTime = 0;
+
+    function debounce(callback, delay) {
+      return function(event) {
+        const currentTime = Date.now();
+        if (currentTime - lastExecutionTime >= delay) {
+          lastExecutionTime = currentTime;
+          callback(event);
+        }
+      };
+    }
+
+    var lastMouseX = 0;
+    var lastMouseY = 0;
+    var angle = 0;
+    var isDebounceRunning = false;
+
     $(window).on("mousemove", (e) => {
-      $(".custom-cursor").attr("style", `left: ${e.clientX}px; top: ${e.clientY}px`);
-    }) 
+      var mouseX = e.clientX;
+      var mouseY = e.clientY; 
+      if (localStorage.getItem("cursor") !== "3") {
+        $(".custom-cursor").css("transform", `rotate(0deg)`);
+      }
+
+      if(localStorage.getItem("cursor") === "3" && !isDebounceRunning) {
+        console.log("reached1");
+
+        isDebounceRunning = true;
+        setTimeout(() => {
+          isDebounceRunning = false;
+        }, 300);
+
+
+        debounce((e) => {
+          console.log("reached2");
+          var deltaX = mouseX - lastMouseX;
+          var deltaY = mouseY - lastMouseY;
+
+          angle = ((Math.atan2(deltaY, deltaX)) * 180 / Math.PI + 360) % 360;
+
+          $(".custom-cursor").css("transform", `rotate(${angle}deg)`);
+
+          $(".custom-cursor").css({
+            "left": `${mouseX}px`,
+            "top": `${mouseY}px`
+          });
+
+        }, 300)(e);
+      }
+
+      $(".custom-cursor").css({
+        "left": `${mouseX}px`,
+        "top": `${mouseY}px`
+      });
+      
+      lastMouseX = mouseX;
+      lastMouseY = mouseY;
+    });
+
+
 
     $(".hoverable").on("mouseenter", function() {
-      console.log(cursorDisabled);
       if (!cursorDisabled) {
         $(this).css("cursor", "pointer");
       }
@@ -517,7 +624,7 @@ function App() {
       <div className="darkmode-container">
         <div className="darkmode-body">
           <div className="darkmode-content">
-            <label htmlFor="darkmode-switch">
+            <label htmlFor="darkmode-switch" className="hoverable">
               <div className="darkmode-toggle"></div>
               <div className="darkmode-labels">
                 <img alt="sun" className="darkmode-label-sun" src={sun} />
@@ -528,31 +635,35 @@ function App() {
         </div>
       </div>
 
-      <input type="checkbox" id="custom-switch" /> <div className="custom-container"> <div className="custom-body">
-        <div className="custom-content">
-          <label htmlFor="custom-switch">
-            <div className="custom-toggle"></div>
-            <div className="custom-labels">
-              <img alt="sun" className="custom-label-sun" src={bgsettings1} />
-              <img alt="moon" className="custom-label-moon" src={bgsettings2} />
-            </div>
-          </label>
+      <input type="checkbox" id="custom-switch" /> 
+      <div className="custom-container"> 
+        <div className="custom-body">
+          <div className="custom-content">
+            <label htmlFor="custom-switch" className="hoverable">
+              <div className="custom-toggle"></div>
+              <div className="custom-labels">
+                <img alt="sun" className="custom-label-sun" src={bgsettings1} />
+                <img alt="moon" className="custom-label-moon" src={bgsettings2} />
+              </div>
+            </label>
+          </div>
         </div>
       </div>
-    </div>
 
-    <input type="checkbox" id="custom2-switch" /> <div className="custom2-container"> <div className="custom2-body">
-        <div className="custom2-content">
-          <label htmlFor="custom2-switch">
-            <div className="custom2-toggle"></div>
-            <div className="custom2-labels">
-              <img alt="sun" className="custom2-label-sun" src={cursor1} />
-              <img alt="moon" className="custom2-label-moon" src={cursor2} />
-            </div>
-          </label>
+      <input type="checkbox" id="custom2-switch" /> 
+      <div className="custom2-container"> 
+        <div className="custom2-body">
+          <div className="custom2-content">
+            <label htmlFor="custom2-switch" className="hoverable">
+              <div className="custom2-toggle"></div>
+              <div className="custom2-labels">
+                <img alt="sun" className="custom2-label-sun" src={cursor1} />
+                <img alt="moon" className="custom2-label-moon" src={cursor2} />
+              </div>
+            </label>
+          </div>
         </div>
       </div>
-    </div>
 
     <div className="settings">
       <p className="anime-container">difficulty</p>
@@ -647,6 +758,14 @@ function App() {
 
       <div className="orb-container">
         <img alt="spherical object" className="orb hoverable" src={orb}/>
+      </div>
+
+      <div className="orb-hold-container">
+        <img alt="spherical object" src={orb}/>
+        <img alt="spherical object" src={orb2}/>
+        <img alt="spherical object" src={orb3}/>
+        <img alt="spherical object" src={orb4}/>
+        <img alt="spherical object" src={orb5}/>
       </div>
 
 

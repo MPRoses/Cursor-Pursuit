@@ -103,10 +103,6 @@ label {
   position: relative;
 }
 
-label:hover {
-  cursor: none;
-}
-
 .settings-wheel:hover {
   cursor: none;
 }
@@ -350,6 +346,10 @@ label:hover {
   z-index: 10;
 }
 
+.orb-hold-container {
+  display: none;
+}
+
 .scoreboard {
   position: fixed;
   top: 3vh;
@@ -460,10 +460,12 @@ label:hover {
   opacity: 0;
   pointer-events: none;
   z-index: 10000;
+  transition: transform 300ms ease-in-out;
 }
 .custom-cursor:nth-child(3), .custom-cursor:nth-child(4) {
   transform: translate(-50%, -50%);
 }
+
 
 .cursor-active {
   opacity: 1;
