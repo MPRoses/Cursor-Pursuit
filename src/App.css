@@ -266,7 +266,7 @@ label {
   text-align: center;
   font-size: 10vw;
   position: relative;
-  top: 5vw;
+  top: calc(5vw + 20px);
   color: black;
   z-index: 2;
 }
@@ -301,7 +301,58 @@ label {
 .word, .title-jump {
   display: inline-block;
   pointer-events: all;
-  transition: transform .73s var(--amazing-cubic);
+  transition: transform .73s var(--amazing-cubic), clip-path 2.5s var(--amazing-cubic) 1.8s;
+}
+.title-jump {
+  clip-path: polygon(0 0, 100% 0, 100% 63%, 0 63%);
+}
+
+.title-jump:nth-child(1) {
+  transition: transform .73s var(--amazing-cubic), clip-path 2.5s var(--amazing-cubic) 1.8s;
+}
+
+.title-jump:nth-child(2) {
+  transition: transform .73s var(--amazing-cubic), clip-path 2.5s var(--amazing-cubic) 2.15s;
+}
+
+.title-jump:nth-child(3) {
+  transition: transform .73s var(--amazing-cubic), clip-path 2.5s var(--amazing-cubic) 1.46s;
+}
+
+.title-jump:nth-child(4) {
+  transition: transform .73s var(--amazing-cubic), clip-path 2.5s var(--amazing-cubic) 1.84s;
+}
+
+.title-jump:nth-child(5) {
+  transition: transform .73s var(--amazing-cubic), clip-path 2.5s var(--amazing-cubic) 1.69s;
+}
+
+.title-jump:nth-child(6) {
+  transition: transform .73s var(--amazing-cubic), clip-path 2.5s var(--amazing-cubic) 2.38s;
+}
+
+.word-bottom .title-jump:nth-child(1) {
+  transition: transform .73s var(--amazing-cubic), clip-path 2.5s var(--amazing-cubic) 1.92s;
+}
+
+.word-bottom .title-jump:nth-child(2) {
+  transition: transform .73s var(--amazing-cubic), clip-path 2.5s var(--amazing-cubic) 2.07s;
+}
+
+.word-bottom .title-jump:nth-child(3) {
+  transition: transform .73s var(--amazing-cubic), clip-path 2.5s var(--amazing-cubic) 1.61s;
+}
+
+.word-bottom .title-jump:nth-child(4) {
+  transition: transform .73s var(--amazing-cubic), clip-path 2.5s var(--amazing-cubic) 1.23s;
+}
+
+.word-bottom .title-jump:nth-child(5) {
+  transition: transform .73s var(--amazing-cubic), clip-path 2.5s var(--amazing-cubic) 1.9s;
+}
+
+.word-bottom .title-jump:nth-child(6) {
+  transition: transform .73s var(--amazing-cubic), clip-path 2.5s var(--amazing-cubic) 1.92s;
 }
 
 
@@ -362,19 +413,19 @@ label {
   margin: 0;
   padding: 0;
   opacity: 0;
-  transition: opacity .73s var(--amazing-cubic) 2s;
+  transition: opacity .73s var(--amazing-cubic) 1s;
 }
 
 .scoreboard p:nth-child(6) {
-  transition: opacity .73s var(--amazing-cubic) 2.1s;
+  transition: opacity .73s var(--amazing-cubic) 1.1s;
 }
 
 .scoreboard p:nth-child(8) {
-  transition: opacity .73s var(--amazing-cubic) 2.2s;
+  transition: opacity .73s var(--amazing-cubic) 1.2s;
 }
 
 .scoreboard p:nth-child(10) {
-  transition: opacity .73s var(--amazing-cubic) 2.3s;
+  transition: opacity .73s var(--amazing-cubic) 1.3s;
 }
 
 .circle-selector {
@@ -489,4 +540,63 @@ label {
   position: relative;
   top: calc(50% - 12px);
   left: calc(50% - 12px);
+}
+
+.game-indicator {
+  width: calc(1vw + 20px);
+  height: calc(60vh - 85px);
+  border: 1px solid black;
+  border-radius: 25px;
+  position: absolute;
+  left: -15vw;
+  background: linear-gradient(to bottom, #ffffff00 49%, #00000033 50%, #ffffff00 51%);
+  top: calc(50vh - 0.5 * (60vh - 85px));
+  transition: opacity .73s var(--amazing-cubic) 1s, left .73s var(--amazing-cubic) 1s, border .3s var(--amazing-cubic);
+
+
+}
+.indicator-seperator {
+  width: calc(1vw + 20px);
+  height: 1px;
+  background-color: black;
+  top: calc(50% - 0.5px);
+  left: 0;
+  position: absolute;
+  transition: background-color .3s var(--amazing-cubic);
+}
+.evade-ball {
+  position: absolute;
+  transition: top .05s var(--amazing-cubic), left .05s var(--amazing-cubic);
+  width: 50px;
+  height: 50px;
+  left: 30vw;
+  top: 60vh;
+  animation: rotateBall 6s forwards infinite;
+  display: none;
+  z-index: 200;
+  pointer-events: all;
+}
+@keyframes rotateBall {
+  0% {
+    transform: rotate(0deg);
+  } 100% {
+    transform: rotate(360deg);
+  }
+}
+.evade-ball img {
+  width: 50px;
+  height: 50px;
+}
+.game-indicator p {
+  font-family: "Just Another Hand", sans-serif;
+  font-size: 20px;
+  color: black;
+  position: absolute;
+  left: 0;
+}
+.game-indicator p:nth-child(2){
+  top: calc(-2vh - 33px);
+}
+.game-indicator p:nth-child(3){
+  bottom: calc(-2vh - 35px);
 }

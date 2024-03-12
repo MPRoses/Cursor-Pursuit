@@ -10,6 +10,7 @@ import settingsFull from './settingsFull.png';
 import bg from './bg.png';
 import bgsettings1 from './bgsettings1.png';
 import bgsettings2 from './bgsettings2.png';
+import crosshair from './crosshair.png';
 import cursor1 from './cursor1.png';
 import cursor2 from './cursor2.png';
 
@@ -83,6 +84,10 @@ function App() {
     $(".darkmode-container, .settings, .bg-container, .title").css("opacity", "1");
     setTimeout(function() {
       $(".darkmode-container, #darkmode-switch").css("pointer-events", "all");
+      $(".word-top .title-jump").css("clip-path", "polygon(0 0, 100% 0, 100% 100%, 0 100%)");
+      setTimeout(() => {
+        $(".word-bottom .title-jump").css("clip-path", "polygon(0 0, 100% 0, 100% 100%, 0 100%)");
+      }, 500);
       setTimeout(() => {
         $(".start-button").css("opacity", "1");
       }, 2000);
@@ -92,6 +97,9 @@ function App() {
     //darkmode
     if (localStorage.getItem("darkmode")) {
       $("body").css("background-color", "#0a0b1d");
+      $(".indicator-seperator").css("background-color", "white");
+      $(".game-indicator").css("border", "1px solid white");
+      $(".game-indicator p").css("color", "white");
       $(".settings-wheel, .start-button, .orb").css("filter", "invert(1)");
       $("#darkmode-switch").prop("checked", true);
       $(".title").css("color", "white");
@@ -106,6 +114,9 @@ function App() {
         if (localStorage.getItem("cursor") === "2") {
           $(".custom-cursor").css("filter", "invert(1)");
         }
+        $(".indicator-seperator").css("background-color", "white");
+        $(".game-indicator").css("border", "1px solid white");
+        $(".game-indicator p").css("color", "white");
         $(".title").css("color", "white");
         $(".scoreboard p").css("color", "white");
         $(".settings-bg").css(".background-color", "rgba(158, 128, 204, 0.795)");
@@ -113,6 +124,9 @@ function App() {
         $("body").css("background-color", "#0a0b1d");
         localStorage.setItem("darkmode", "true");
       } else {
+        $(".indicator-seperator").css("background-color", "black");
+        $(".game-indicator").css("border", "1px solid black");
+        $(".game-indicator p").css("color", "black");
         $(".custom-cursor").css("filter", "invert(0)");
         $(".title").css("color", "black");
         $(".scoreboard p").css("color", "black");
@@ -157,7 +171,6 @@ function App() {
     });
 
     
-    
     //settings
     $(".settings-wheel").on("click", function() {
       if ($(".settings").hasClass("active")) {
@@ -178,7 +191,7 @@ function App() {
         $(".circle-selector").css("transform", "translateX(10vw)");
         $(".selector-left").css("transform", "translateX(-10vw)");
         $(".circle-selector").css("filter", "opacity(0)");
-
+        $(".option").css("transform", "translateY(-200px)");
         $(".circle-item").css("transform", "translateX(5vw)");
         $(".circle-item-left").css("transform", "translateX(-5vw)");
 
@@ -322,8 +335,11 @@ function App() {
     $(window).on("mousemove", (e) => {
       var mouseX = e.clientX;
       var mouseY = e.clientY; 
-      if (localStorage.getItem("cursor") !== "3") {
-        $(".custom-cursor").css("transform", `rotate(0deg)`);
+      var index = localStorage.getItem("cursor");
+      if (index === "2") {
+        $(".custom-cursor").css("transform", `translate(-50%, -50%) rotate(0deg)`);
+      } else if (index !== "3") {
+       $(".custom-cursor").css("transform", `rotate(0deg)`);
       }
 
       if(localStorage.getItem("cursor") === "3" && !isDebounceRunning) {
@@ -342,7 +358,7 @@ function App() {
 
           angle = ((Math.atan2(deltaY, deltaX)) * 180 / Math.PI + 360) % 360;
 
-          $(".custom-cursor").css("transform", `rotate(${angle}deg)`);
+          $(".custom-cursor").css("transform", `rotate(${angle}deg) translate(-50%, -50%)`);
 
           $(".custom-cursor").css({
             "left": `${mouseX}px`,
@@ -360,8 +376,6 @@ function App() {
       lastMouseX = mouseX;
       lastMouseY = mouseY;
     });
-
-
 
     $(".hoverable").on("mouseenter", function() {
       if (!cursorDisabled) {
@@ -386,12 +400,176 @@ function App() {
         $(this).css("cursor", "unset");
       }
     })
-    
+
+    var centralGameInterval;
+
+     //start button
+     $(".start-button").on(("click"), function() {
+      $(".scoreboard p").eq(1).text(`POINTS:`);
+      $(".scoreboard p").eq(2).text(`ORBS LOST:`);
+      $(".scoreboard p").eq(3).text(`ORBS COLLECTED:`);
+
+      $(".game-indicator").css("left", "3vw");
+      $(".game-indicator").css("opacity", "1");
+
+      $(".scoreboard p").css("opacity", "1");
+
+      $(".word").css("transition", "transform 2s var(--amazing-cubic)")
+      $(".word").eq(0).css("transform", "translateX(-100vw)");
+      $(".word").eq(1).css("transform", "translateX(100vw)");
+      $(".start-button").css({
+        "transform": "translateY(30vh)",
+        "opacity": "0",
+        "pointer-events": "none"
+      });
+       
+      totalScore = 0;
+      totalWon = 0;
+      totalLost = 0;
+
+      console.log("reached 1");
+      flag = true;
+      centralGameLoop();
+      centralGameInterval = setInterval(centralGameLoop, 15000);
+    })
+
+
+    //.game-indicator code
+    const $gameIndicator = $('.game-indicator');
+    var initialGradient;
+    var finalGradient;
   
+
+    function updateGradient(step) {
+      if (localStorage.getItem("darkmode")) {
+        initialGradient = 'linear-gradient(to bottom, #00000000 49%, #ffffff33 50%, #00000000 ';
+      } else {
+        initialGradient = 'linear-gradient(to bottom, #ffffff00 49%, #00000033 50%, #ffffff00 ';
+      }
+
+      $gameIndicator.css('background', initialGradient + step + "%)");
+    }
+
+    function startIndicator() {
+      let step = 51;
+      var runs = 0;
+      const indicatorInterval = setInterval(() => {
+        runs++;
+        step++;
+        if (step >= 99) {
+          clearInterval(indicatorInterval);
+          if (localStorage.getItem("darkmode")) {
+            finalGradient = 'linear-gradient(to bottom, #00000000 49%, #00000033 50%, #00000000 100%)';
+          } else {
+            finalGradient = 'linear-gradient(to bottom, #ffffff00 49%, #00000033 50%, #ffffff00 100%)';
+          }
+
+          $gameIndicator.css('background', finalGradient);
+        } else {
+          updateGradient(step);
+        }
+        console.log("runs " + runs); 
+      }, 271);
+      var color = localStorage.getItem("darkmode") ? "white" : "black";
+
+      setTimeout(() => {
+        $(".game-indicator").css("border", "1px solid green");
+        $(".game-seperator").css("background-color", "green");
+        setTimeout(() => {
+          $(".game-indicator").css("border", "1px solid " + color);
+          $(".game-seperator").css("background-color", color);
+          setTimeout(() => {
+            $(".game-indicator").css("border", "1px solid green");
+            $(".game-seperator").css("background-color", "green");
+            setTimeout(() => {
+              $(".game-indicator").css("border", "1px solid " + color);
+              $(".game-seperator").css("background-color", color);
+            }, 600);
+          }, 300);
+        }, 300);
+      }, 13000);
+    }
+
+
+    var evadeDisabled = true;
+    
+    function stopGame() {
+      activeGame = false;
+    }
+    function restartGame() {
+      console.log("reached 3");
+      activeGame = true;
+      evadeDisabled = true;
+      startGame();
+    }
+
+
+    var evadePointIncreaserInterval;
+    
+    function evadePointIncreaser() {
+      totalScore++;
+      $(".scoreboard p").eq(1).text(`POINTS: ${totalScore}`);
+    }
+
+    function startEvade() {
+      evadeDisabled = true;
+      $(".evade-ball").css({
+        "top": "20px",
+        "left": "calc(50vw - 0.5 * 40px)"
+      })
+      $(".evade-ball").css("transition", "top 1s var(--amazing-cubic), left 1s var(--amazing-cubic)");
+      $(".evade-ball").css("display", "block");
+      setTimeout(() => {
+        evadeDisabled = false;
+        updateBallPosition();
+
+        // I want to create interval here based on evadePointIncreaser; to run every 500ms and for it to be cleared after 14000ms
+        evadePointIncreaserInterval = setInterval(evadePointIncreaser, 500);
+        setTimeout(() => {
+          clearInterval(evadePointIncreaserInterval);
+        }, 14000);
+      
+        var speed = .1; 
+        $(".evade-ball").css("transition", "top " + speed + "s var(--amazing-cubic), left " + speed + "s var(--amazing-cubic)");
+      }, 1000);
+    }
+
+    $(".evade-ball").on("mouseenter", function() {
+      // here the interval just created should also be cleared
+      clearInterval(evadePointIncreaserInterval);
+      clearInterval(centralGameInterval);
+      resetToStart();
+      activeGame = false;
+      gameIsLost = false;
+      stopEvade();
+    })
+
+
+    function stopEvade() {
+      $(".evade-ball").css("transition", "top 1s var(--amazing-cubic), left 1s var(--amazing-cubic)");
+      $(".evade-ball").css("display", "none");
+    }
+
+    var flag = true;
+
+    function centralGameLoop() {
+      console.log("reached 2");
+      if (flag) {
+        stopGame();
+        stopEvade();
+        restartGame();
+      } else {
+        stopGame();
+        startEvade();
+      }
+      flag = !flag;
+    }
+
 
     //startGame() and game functionality
     
     var activeGame = false;
+    var gameIsLost = false;
     var totalScore = 0;
     var totalWon = 0;
     var totalLost = 0;
@@ -399,7 +577,8 @@ function App() {
     var margin = 0;
 
     function startGame() {
-      activeGame = true;
+
+      console.log("reached 4");
 
       $(".orb").css("display", "block");
       var orb = $(".orb");
@@ -409,7 +588,9 @@ function App() {
     
       function gameLoop() {
         if (!activeGame) {
-          resetToStart();
+          if (gameIsLost) {
+            resetToStart();
+          }
           return;
         }
     
@@ -493,7 +674,10 @@ function App() {
 
               if (totalLost === 5) { // game is lost
                 activeGame = false;
-                
+                gameIsLost = false;
+                clearInterval(centralGameInterval);
+                resetToStart();
+
                 if (localStorage.getItem("highscore") < totalScore) {
                   localStorage.setItem("highscore", `${totalScore}`);
                   $(".scoreboard p").eq(0).text(`HIGHSCORE: ${totalScore}`);
@@ -505,7 +689,7 @@ function App() {
           }, 4000);
         }, 200);
     
-        setTimeout(gameLoop, 1000); // Call gameLoop again after 1000ms
+        setTimeout(gameLoop, 500);
       }
     
       // Start the initial game loop
@@ -524,6 +708,10 @@ function App() {
       }, 500);
 
 
+      
+      $(".game-indicator").css("left", "-15vw");
+      $(".game-indicator").css("opacity", "0");
+
       $(".start-button").css({
         "transform": "",
         "opacity": "1",
@@ -532,31 +720,6 @@ function App() {
       $(".word").css("transition", "transform .73s var(--amazing-cubic)");
       
     }
-
-
-    //start button
-    $(".start-button").on(("click"), function() {
-      $(".scoreboard p").eq(1).text(`POINTS:`);
-      $(".scoreboard p").eq(2).text(`ORBS LOST:`);
-      $(".scoreboard p").eq(3).text(`ORBS COLLECTED:`);
-
-      $(".scoreboard p").css("opacity", "1");
-
-      $(".word").css("transition", "transform 2s var(--amazing-cubic)")
-      $(".word").eq(0).css("transform", "translateX(-100vw)");
-      $(".word").eq(1).css("transform", "translateX(100vw)");
-      $(".start-button").css({
-        "transform": "translateY(30vh)",
-        "opacity": "0",
-        "pointer-events": "none"
-      });
-       
-      totalScore = 0;
-      totalWon = 0;
-      totalLost = 0;
-    
-      startGame();
-    })
 
     function generatePoint() {
       const left = Math.floor(Math.random() * 80) + 10;
@@ -611,7 +774,41 @@ function App() {
         duration: 800,
         delay: (el, i) => 800 * i
       })
+
+    // evade ball
+    const orb = $('.evade-ball');
+
+    let mouseX = 0;
+    let mouseY = 0;
+
+    // Update mouse position
+    $(document).on("mousemove", function(e) {
+      mouseX = e.pageX;
+      mouseY = e.pageY;
+    });
+
+    // Update ball position with a delay
+    function updateBallPosition() {
+      if (evadeDisabled) {
+        return;
+      }
+      
+      const currentX = parseFloat(orb.css('left')) || 0;
+      const currentY = parseFloat(orb.css('top')) || 0;
+
+      const targetX = mouseX - orb.width() / 2;
+      const targetY = mouseY - orb.height() / 2;
+
+      const newX = currentX + (targetX - currentX) * 0.1; // Adjust the factor for smoother movement
+      const newY = currentY + (targetY - currentY) * 0.1;
+      
+      orb.css({ left: `${newX}px`, top: `${newY}px` });
+      requestAnimationFrame(updateBallPosition);
+    }
+
   })
+
+    
   return (
     <div className="App">
       <div className="preloader">
@@ -730,7 +927,7 @@ function App() {
 
     <div className="main">
       <div className="title defaultcursor anime-container2">
-      <span className="word">
+      <span className="word word-top">
         <div className="title-jump">C</div>
         <div className="title-jump">U</div>
         <div className="title-jump">R</div>
@@ -739,7 +936,7 @@ function App() {
         <div className="title-jump">R</div>
       </span>
       <br></br>
-      <span className="word">
+      <span className="word word-bottom">
         <div className="title-jump">P</div>
         <div className="title-jump">U</div>
         <div className="title-jump">R</div>
@@ -749,11 +946,21 @@ function App() {
         <div className="title-jump">T</div>
       </span>
       </div>
+
+
       <div className="start-container">
         <img alt="start button" className="start-button hoverable" src={start} />
       </div>
 
+      <div className="game-indicator">
+        <div className="indicator-seperator"></div>
+        <p>EVADE</p>
+        <p>PURSUIT</p>
+      </div>
 
+      <div className="evade-ball hoverable">
+        <img alt="orb" src={crosshair}/>
+      </div>
 
 
       <div className="orb-container">
