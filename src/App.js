@@ -26,6 +26,15 @@ import ball_3 from './ball_3.png';
 import ball_4 from './ball_4.png';
 import ball_5 from './ball_5.png';
 
+import MESSAGE_1 from './MESSAGE_1.png';
+import MESSAGE_2 from './MESSAGE_2.png';
+import MESSAGE_3 from './MESSAGE_3.png';
+import MESSAGE_4 from './MESSAGE_4.png';
+import MESSAGE_5 from './MESSAGE_5.png';
+import MESSAGE_6 from './MESSAGE_6.png';
+
+import github from './github.png'
+
 import orb from './orb.png';
 import orb2 from './orb2.png';
 import orb3 from './orb3.png';
@@ -64,24 +73,78 @@ function App() {
     }
 
     //difficulty
+    var difficultyIndex = 0;
+
     if (!localStorage.getItem("difficulty")) {
       localStorage.setItem("difficulty", "easy");
       $(".option-easy").addClass("option-selected");
+      difficultyIndex = 1;
     } else {
       $(".option").removeClass("option-selected");
       if (localStorage.getItem("difficulty") === "less easy") {
+        difficultyIndex = 2;
         $(".option-medium").addClass("option-selected");
       } else if (localStorage.getItem("difficulty") === "kinda hard") {
+        difficultyIndex = 3;
         $(".option-hard").addClass("option-selected");
       } else if (localStorage.getItem("difficulty") === "why are we here") {
+        difficultyIndex = 4;
         $(".option-help").addClass("option-selected");
       } else {
+        difficultyIndex = 1;
         $(".option-easy").addClass("option-selected");
       }
+    } 
+
+    // easy to hard
+    var diff1 = [1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5, 5, 5.25];
+    var diff2 = [2, 3, 4, 4.5, 5, 5.5, 6.5, 7.25, 7.75, 8];
+    var diff3 = [5, 6, 7, 8, 8.25, 8.5, 8.75, 9, 9.25, 9.5];
+    var diff4 = [8, 9, 10, 10.5, 11, 11.5, 12, 12.5, 13, 13.5];
+
+    var currentDiff;
+    var iterations = 0;
+    var movingSpeedOfCrosshair;
+    var speedOfWhichOrbsSpawn;
+
+    function changeDiff(difficultyIndex) {
+      switch(difficultyIndex) {
+        case 2:
+          currentDiff = diff2;
+          break;
+        case 3:
+          currentDiff = diff3;
+            break;
+        case 4:
+          currentDiff = diff4;
+          break;
+        default:
+          currentDiff = diff1;
+      }
+
+      if (iterations < 10) {
+        // 1-10 -> 1 / ((here) * 3) with 10 being harder than 1
+        movingSpeedOfCrosshair = 1 / ((currentDiff[Math.floor(iterations / 2)]) * 3);
+        // 1-10 -> (1000 / (here)) with 10 being harder than 1
+        speedOfWhichOrbsSpawn = 100 + (1000 / (currentDiff[Math.floor(iterations / 2)]));
+      } else {
+
+        if  (movingSpeedOfCrosshair > 0.02) {
+            movingSpeedOfCrosshair -= .01;
+        }
+
+        if (speedOfWhichOrbsSpawn > 100) {
+          speedOfWhichOrbsSpawn -= 20;
+        }
+      }
+
     }
+
+    changeDiff(difficultyIndex);
 
     //preloader
     $(".darkmode-container, .settings, .bg-container, .title").css("opacity", "1");
+    $(".made-by-github").css("opacity", "0.2");
     setTimeout(function() {
       $(".darkmode-container, #darkmode-switch").css("pointer-events", "all");
       $(".word-top .title-jump").css("clip-path", "polygon(0 0, 100% 0, 100% 100%, 0 100%)");
@@ -92,6 +155,11 @@ function App() {
         $(".start-button").css("opacity", "1");
       }, 2000);
     }, 2200);
+
+    // github made by
+    $(".made-by-github").on("click", () => {
+      window.open('https://www.github.com/MPRoses', '_blank');
+    })
     
 
     //darkmode
@@ -100,7 +168,7 @@ function App() {
       $(".indicator-seperator").css("background-color", "white");
       $(".game-indicator").css("border", "1px solid white");
       $(".game-indicator p").css("color", "white");
-      $(".settings-wheel, .start-button, .orb").css("filter", "invert(1)");
+      $(".settings-wheel, .start-button, .orb, .made-by-github").css("filter", "invert(1)");
       $("#darkmode-switch").prop("checked", true);
       $(".title").css("color", "white");
       $(".scoreboard p").css("color", "white");
@@ -120,7 +188,7 @@ function App() {
         $(".title").css("color", "white");
         $(".scoreboard p").css("color", "white");
         $(".settings-bg").css(".background-color", "rgba(158, 128, 204, 0.795)");
-        $(".settings-wheel, .start-button, .orb").css("filter", "invert(1)");
+        $(".settings-wheel, .start-button, .orb, .made-by-github").css("filter", "invert(1)");
         $("body").css("background-color", "#0a0b1d");
         localStorage.setItem("darkmode", "true");
       } else {
@@ -131,7 +199,7 @@ function App() {
         $(".title").css("color", "black");
         $(".scoreboard p").css("color", "black");
         $(".settings-bg").css(".background-color", "rgba(221, 201, 255, 0.493)");
-        $(".settings-wheel, .start-button, .orb").css("filter", "invert(0)");
+        $(".settings-wheel, .start-button, .orb, .made-by-github").css("filter", "invert(0)");
         $("body").css("background-color", "white");
         localStorage.removeItem("darkmode");
       }
@@ -263,7 +331,9 @@ function App() {
       }
       $(".option").removeClass("option-selected");
       $(this).addClass("option-selected");
-      localStorage.setItem("difficulty", `${$(this).text()}`)
+      localStorage.setItem("difficulty", `${$(this).text()}`);
+      difficultyIndex = ($(this).index() + 1);
+      changeDiff(difficultyIndex);
     });
 
     $(".circle-item-left").on("click", function() {
@@ -343,7 +413,6 @@ function App() {
       }
 
       if(localStorage.getItem("cursor") === "3" && !isDebounceRunning) {
-        console.log("reached1");
 
         isDebounceRunning = true;
         setTimeout(() => {
@@ -352,7 +421,6 @@ function App() {
 
 
         debounce((e) => {
-          console.log("reached2");
           var deltaX = mouseX - lastMouseX;
           var deltaY = mouseY - lastMouseY;
 
@@ -380,12 +448,16 @@ function App() {
     $(".hoverable").on("mouseenter", function() {
       if (!cursorDisabled) {
         $(this).css("cursor", "pointer");
+      } else {
+        $(this).css("cursor", "none");
       }
     })
 
     $(".hoverable").on("mouseleave", function() {
       if (!cursorDisabled) {
         $(this).css("cursor", "unset");
+      } else {
+        $(this).css("cursor", "none");
       }
     })
 
@@ -426,15 +498,35 @@ function App() {
       totalScore = 0;
       totalWon = 0;
       totalLost = 0;
+      avgReactionSpeed = 0;
 
-      console.log("reached 1");
       flag = true;
+      iterations = 0;
       centralGameLoop();
       centralGameInterval = setInterval(centralGameLoop, 15000);
     })
+    // message
+    function enterMessage(index) {
+      var item = $(".message-container").children().eq(index);
+
+      if (index === 5) {
+        $(".message-container p").css("opacity", "1");
+      } else {
+        $(".message-container p").css("opacity", "0");
+      }
+
+      item.css("opacity", "1");
+      $(".message-container").css("top", "0");
+
+      setTimeout(() => {
+        item.css("opacity", "0");
+        $(".message-container").css("top", "calc(-20vw - 120px)");
+      }, 3300);
+    }
 
 
-    //.game-indicator code
+    //.game-indicator code (edit, commented out, maybe another time? it felt rather not needed)
+    /*
     const $gameIndicator = $('.game-indicator');
     var initialGradient;
     var finalGradient;
@@ -468,7 +560,6 @@ function App() {
         } else {
           updateGradient(step);
         }
-        console.log("runs " + runs); 
       }, 271);
       var color = localStorage.getItem("darkmode") ? "white" : "black";
 
@@ -489,7 +580,7 @@ function App() {
         }, 300);
       }, 13000);
     }
-
+    */
 
     var evadeDisabled = true;
     
@@ -497,12 +588,10 @@ function App() {
       activeGame = false;
     }
     function restartGame() {
-      console.log("reached 3");
       activeGame = true;
       evadeDisabled = true;
       startGame();
     }
-
 
     var evadePointIncreaserInterval;
     
@@ -522,20 +611,27 @@ function App() {
       setTimeout(() => {
         evadeDisabled = false;
         updateBallPosition();
-
-        // I want to create interval here based on evadePointIncreaser; to run every 500ms and for it to be cleared after 14000ms
         evadePointIncreaserInterval = setInterval(evadePointIncreaser, 500);
         setTimeout(() => {
           clearInterval(evadePointIncreaserInterval);
         }, 14000);
-      
-        var speed = .1; 
+        
+        
+        var speed = movingSpeedOfCrosshair; //difficulty
+        console.log("currentspeed " + speed);
         $(".evade-ball").css("transition", "top " + speed + "s var(--amazing-cubic), left " + speed + "s var(--amazing-cubic)");
       }, 1000);
     }
 
     $(".evade-ball").on("mouseenter", function() {
-      // here the interval just created should also be cleared
+      enterMessage(2);
+
+      if (localStorage.getItem("highscore") < totalScore) {
+        enterMessage(4);
+        localStorage.setItem("highscore", `${totalScore}`);
+        $(".scoreboard p").eq(0).text(`HIGHSCORE: ${totalScore}`);
+      }
+
       clearInterval(evadePointIncreaserInterval);
       clearInterval(centralGameInterval);
       resetToStart();
@@ -543,7 +639,6 @@ function App() {
       gameIsLost = false;
       stopEvade();
     })
-
 
     function stopEvade() {
       $(".evade-ball").css("transition", "top 1s var(--amazing-cubic), left 1s var(--amazing-cubic)");
@@ -553,21 +648,29 @@ function App() {
     var flag = true;
 
     function centralGameLoop() {
-      console.log("reached 2");
       if (flag) {
+        enterMessage(0);
         stopGame();
         stopEvade();
         restartGame();
       } else {
+        enterMessage(1);
         stopGame();
         startEvade();
       }
       flag = !flag;
+      
+      if (iterations % 2 === 0) {
+        changeDiff(difficultyIndex);
+        $(".message-container p").text(Math.floor(iterations / 2) + 1);
+        setTimeout(() => {
+          enterMessage(5);
+        }, 4000);
+      }
+      iterations++;
     }
 
-
-    //startGame() and game functionality
-    
+    //startGame() and game functionality    
     var activeGame = false;
     var gameIsLost = false;
     var totalScore = 0;
@@ -577,9 +680,6 @@ function App() {
     var margin = 0;
 
     function startGame() {
-
-      console.log("reached 4");
-
       $(".orb").css("display", "block");
       var orb = $(".orb");
       var tempOrb = orb.clone();
@@ -673,12 +773,19 @@ function App() {
 
 
               if (totalLost === 5) { // game is lost
+                setTimeout(() => {
+                  enterMessage(3);
+                }, 4000);
+
+
                 activeGame = false;
                 gameIsLost = false;
                 clearInterval(centralGameInterval);
                 resetToStart();
 
                 if (localStorage.getItem("highscore") < totalScore) {
+                  enterMessage(4);
+
                   localStorage.setItem("highscore", `${totalScore}`);
                   $(".scoreboard p").eq(0).text(`HIGHSCORE: ${totalScore}`);
                 }
@@ -688,8 +795,9 @@ function App() {
             }
           }, 4000);
         }, 200);
-    
-        setTimeout(gameLoop, 500);
+        
+        console.log("orbs spawn speed" + speedOfWhichOrbsSpawn);
+        setTimeout(gameLoop, speedOfWhichOrbsSpawn);//difficulty
       }
     
       // Start the initial game loop
@@ -817,7 +925,7 @@ function App() {
       </div>
 
 
-      <input type="checkbox" id="darkmode-switch" />
+    <input type="checkbox" id="darkmode-switch" />
       <div className="darkmode-container">
         <div className="darkmode-body">
           <div className="darkmode-content">
@@ -861,8 +969,10 @@ function App() {
           </div>
         </div>
       </div>
+     
 
-    <div className="settings">
+     <div className="settings-maincontainer">
+     <div className="settings">
       <p className="anime-container">difficulty</p>
       <div className="settings-content">
         <div className="option hoverable option-easy option-selected">easy</div>
@@ -911,6 +1021,9 @@ function App() {
         <img alt="ball" className="circle-item-ball" src={ball_5}/>
       </div>
     </div>
+     </div>
+
+    
 
     <div className="cursor">
       <img alt="cursor" className="custom-cursor empty-cursor" src={cursor_1} />
@@ -922,6 +1035,10 @@ function App() {
 
     <div className="bg-container">
       <img alt="blurred circles" className="bg" src={bg}/>
+    </div>
+
+    <div className="made-by-github hoverable">
+      <img alt="github" src={github} />
     </div>
 
 
@@ -973,6 +1090,16 @@ function App() {
         <img alt="spherical object" src={orb3}/>
         <img alt="spherical object" src={orb4}/>
         <img alt="spherical object" src={orb5}/>
+      </div>
+
+      <div className="message-container">
+        <img alt="message" src={MESSAGE_1}/>
+        <img alt="message" src={MESSAGE_2}/>
+        <img alt="message" src={MESSAGE_3}/>
+        <img alt="message" src={MESSAGE_4}/>
+        <img alt="message" src={MESSAGE_5}/>
+        <img alt="message" src={MESSAGE_6}/>
+        <p>1</p>
       </div>
 
 

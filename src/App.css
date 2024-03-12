@@ -64,6 +64,7 @@ body {
   width: 100px;
   left: 3vw;
   z-index: 100;
+  opacity: 0;
   transition: opacity 1s var(--amazing-cubic) 2s, bottom 1s var(--amazing-cubic) 2s;
   pointer-events: all;
 }
@@ -553,6 +554,7 @@ label {
   top: calc(50vh - 0.5 * (60vh - 85px));
   transition: opacity .73s var(--amazing-cubic) 1s, left .73s var(--amazing-cubic) 1s, border .3s var(--amazing-cubic);
 
+  display: none;
 
 }
 .indicator-seperator {
@@ -563,6 +565,8 @@ label {
   left: 0;
   position: absolute;
   transition: background-color .3s var(--amazing-cubic);
+
+  display: none;
 }
 .evade-ball {
   position: absolute;
@@ -599,4 +603,43 @@ label {
 }
 .game-indicator p:nth-child(3){
   bottom: calc(-2vh - 35px);
+}
+.message-container {
+  width: 120px;
+  position: absolute;
+  left: calc(50vw - 0.5 * 120px);
+  top: calc(-20vh - 120px);
+  z-index: 10000;
+  transition: top .73s var(--amazing-cubic);
+}
+.message-container img {
+  width: 120px;
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  transition: opacity .73s var(--amazing-cubic);
+}
+.message-container p {
+  font-family: "Slacky", sans-serif;
+  font-size: 35px;
+  position: relative;
+  color: white;
+  top: 16px;
+  text-align: center;
+}
+.made-by-github {
+  width: 25px;
+  height: 25px;
+  position: fixed;
+  z-index: 200;
+  opacity: 1;
+  bottom: 3vh;
+  right: 3vw;
+  opacity: 0;
+  transition: opacity .73s var(--amazing-cubic) 2s;
+}
+.made-by-github img {
+  width: 25px;
+  height: 25px;
 }
